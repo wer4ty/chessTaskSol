@@ -1,6 +1,7 @@
 .board {
     width: 400px;
-    margin: auto
+    margin: auto;
+    margin-top: 40px;
 }
 
 .info {

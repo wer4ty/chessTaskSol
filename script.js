@@ -1,4 +1,4 @@
-var pos, fen;
+var pos, fen, chess;
 
 var board = ChessBoard('board', {
   draggable: true,
@@ -7,19 +7,18 @@ var board = ChessBoard('board', {
 });
 
 
-function clickGetPositionBtn() {
-  console.log("Current position as an Object:");
-  pos = board.position();
-  console.log(pos);
+function findSolution() {
+   pos = board.position();
+   fen = board.fen();
+   
+   tmp_fen = '8/8/6Q1/4K3/8/8/3k4/8';
+   chess = new Chess(tmp_fen);
+   board.fen(tmp_fen);
+   
+   console.log(chess.ugly_moves());
+   console.log(chess.game_over());
+   console.log(chess.fen());
 
-  console.log("Current position as a FEN string:");
-  fen = board.fen();
-  console.log(fen);
 }
 
-$('#getPositionBtn').on('click', clickGetPositionBtn);
-$('#clearBtn').on('click', board.clear);
-
-$('#setRuyLopezBtn').on('click', function() {
-  board.position(fen);
-});
+$('#solve').on('click', findSolution);
