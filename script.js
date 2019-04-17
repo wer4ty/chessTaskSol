@@ -1,4 +1,6 @@
-var chess, board, depth_think, turn, moveCounter = 0;
+var chess, board, depth_think, turn, moveCounter = 0, timer;
+
+game = new Chess();
 
 board = ChessBoard('board', {
   draggable: true,
@@ -8,93 +10,91 @@ board = ChessBoard('board', {
 
 
 function findSolution() {
-  depth_think = 2;
 
-   chess = new Chess();
+	let num_moves = $("#search-depth").val();
+	
+  depth_think = parseInt(num_moves);
+  
+  if (moveCounter % 2 == 0) turn = 'w'; else turn = 'b';
+   var tmp  =board.position('fen')+' '+turn+' KQkq - 0 1';
+   //var tmp  =board.position('fen')+' '+turn;
+   game.load(tmp);
+  
+  var makeRandomMove = function() {
+  var possibleMoves = game.moves();
+
+  // exit if the game is over
+  if (game.game_over() === true ||
+    game.in_draw() === true ||
+    possibleMoves.length === 0) return;
+
+  var randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  game.move(possibleMoves[randomIndex]);
+  board.position(game.fen());
+
+  window.setTimeout(makeRandomMove, 500);
+};
+
+window.setTimeout(makeRandomMove, 500);
+  
+  
+  
+  /*
+  console.log("Board Current position: "+board.fen());
+   console.log("Algorithm Current position: "+game.fen());
+
+    console.log("in_check ["+game.in_check()+"]");
+    console.log("in_checkmate ["+game.in_checkmate()+"]");
+    console.log("in_draw ["+game.in_draw()+"]");
+
+   console.log("Is game over ["+game.game_over()+"]");	
+	*/
+
+	/*
+   
    if (moveCounter % 2 == 0) turn = 'w'; else turn = 'b';
    var tmp  =board.position('fen')+' '+turn+' KQkq - 0 1';
    chess.load(tmp);
 
 
      statusCall();
+	var newGameMoves;
+     //for (var  i =0; i<depth_think; i++) {
+        newGameMoves = chess.ugly_moves();
+     //}
+    
+     
 
-     for (var  i =0; i<depth_think; i++) {
+    if (game.game_over()) { alert('Game over');}
+    else {
+    		var bestMove = newGameMoves
+    		game.ugly_move(bestMove[Math.floor(Math.random() * bestMove.length)]);
+    		board.position(game.fen());
+    }
 
-        var newGameMoves = chess.ugly_moves();
-
-     }
-
+	moveCounter++;
+	*/
 }
 
-// var minimaxRoot =function(depth, game, isMaximisingPlayer) {
-
-//     var newGameMoves = game.ugly_moves();
-//     var bestMove = -9999;
-//     var bestMoveFound;
-
-//     for(var i = 0; i < newGameMoves.length; i++) {
-//         var newGameMove = newGameMoves[i];
-//         game.ugly_move(newGameMove);
-//         var value = minimax(depth - 1, game, !isMaximisingPlayer);
-
-//         game.undo();
-        
-//         if(value >= bestMove) {
-//             bestMove = value;
-//             bestMoveFound = newGameMove;
-//         }
-//     }
-//     return bestMoveFound;
-// };
+ 
 
 
-// var minimax = function (depth, game, isMaximisingPlayer) {
-//     if (depth === 0) {
-//         return -evaluateBoard(game.board());
-//     }
 
-//     var newGameMoves = game.ugly_moves();
-
-//     if (isMaximisingPlayer) {
-//         var bestMove = -9999;
-//         for (var i = 0; i < newGameMoves.length; i++) {
-//             game.ugly_move(newGameMoves[i]);
-//             bestMove = Math.max(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
-//             game.undo();
-//         }
-//         return bestMove;
-//     } else {
-//         var bestMove = 9999;
-//         for (var i = 0; i < newGameMoves.length; i++) {
-//             game.ugly_move(newGameMoves[i]);
-//             bestMove = Math.min(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
-//             game.undo();
-//         }
-//         return bestMove;
-//     }
-// };
 
 
 function clearTask() {
   board.clear();
-  chess.clear();
+  game.clear();
 
-  statusCall();
+  
+ // clearInterval(timer);
 }
 
-function statusCall() {
 
-  console.log("Board Current position: "+board.fen());
-   console.log("Algorithm Current position: "+chess.fen());
-
-   // console.log("in_check ["+chess.in_check()+"]");
-   // console.log("in_checkmate ["+chess.in_checkmate()+"]");
-   // console.log("in_draw ["+chess.in_draw()+"]");
-
-   //console.log("Is game over ["+chess.game_over()+"]");
-
-
+function start() {
+findSolution();
+	//timer = setInterval(findSolution, 1000);
 }
 
-$('#solve').on('click', findSolution);
+$('#solve').on('click', start);
 $('#clear').on('click', clearTask);
