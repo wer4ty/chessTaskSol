@@ -7,7 +7,7 @@ function removeOOO(arr) {
    return arr;
 }
 
-var minimaxRoot =function(depth, game, isMaximisingPlayer) {
+var minimaxRoot =function(depth, game, isMaximisingPlayer, solution) {
 
     var newGameMoves = removeOOO(game.moves());
     console.log(newGameMoves);
@@ -26,6 +26,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
         }
         
     }
+    solution.push(bestMoveFound);
     return bestMoveFound;
 };
 
@@ -53,27 +54,27 @@ var minimax = function (depth, game, isMaximisingPlayer) {
     }
 
     var newGameMoves = removeOOO(game.moves());
-    
 	 for (var i = 0; i < newGameMoves.length; i++) {
+	 			var best = 0;
             game.move(newGameMoves[i]);
-            minimax(depth - 1, game, !isMaximisingPlayer);
+            best = Math.max(best, minimax(depth - 1, game, !isMaximisingPlayer));
             game.undo();
         }
-    return 0;
+    return best;
     
 };
 
 
 
 
-var getBestMove = function (game) {
+var getBestMove = function (game, arr) {
 	/*
     if (game.game_over()) {
         alert('Game over');
     }
     */
     
-    var bestMove = minimaxRoot(2, game, true);
+    var bestMove = minimaxRoot(2, game, true, arr);
 
     return bestMove;
 };

@@ -28,10 +28,13 @@ function removeOOO(arr) {
 
 
 function findSolution() {
-
-var bestMove = getBestMove(game);
+var solve = [];
+var bestMove = getBestMove(game, solve);
     game.move(bestMove);
     board.position(game.fen());
+   
+   
+   console.log(solve);
    
     if (game.game_over()) {
         alert('Game over');
