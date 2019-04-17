@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<!--
     Checkmate in num moves:
     <select id="search-depth">
         <option value="1">1</option>
@@ -15,13 +16,15 @@
     </select>
 
     First move by:
-    <select id="search-depth">
-        <option value="1" selected>White</option>
-        <option value="0" >Black</option>
+    <select id="move-turn">
+        <option value="0" selected>White</option>
+        <option value="1" >Black</option>
     </select>
+    -->
 
     <input type="button" id="solve" value="Start" />
     <input type="button" id="clear" value="Clear" />
+    <input type="button" id="stop" value="Stop" />
 
 
 <div id="board" class="board"></div>
@@ -31,6 +34,7 @@
 <script src="lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="lib/chessboardjs/js/chess.js"></script>
 <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
+<script src="ml.js"></script>
 <script src="script.js"></script>
 
 <script>
