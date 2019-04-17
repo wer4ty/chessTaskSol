@@ -11,16 +11,19 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 
     var newGameMoves = removeOOO(game.moves());
     console.log(newGameMoves);
-    
+    let best = 0;
     for(var i = 0; i < newGameMoves.length; i++) {
         var newGameMove = newGameMoves[i];
         console.log("1. "+newGameMove);
         game.move(newGameMove);
-        var value = minimax(depth - 1, game, !isMaximisingPlayer);
+        var value = Math.max(best, minimax(depth - 1, game, !isMaximisingPlayer));
 
         game.undo();
         
+        if (value >= best) {
+        best = value;
         bestMoveFound = newGameMove;
+        }
         
     }
     return bestMoveFound;
@@ -32,19 +35,31 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 
 var minimax = function (depth, game, isMaximisingPlayer) {	
     if (depth === 0) {
-        return 0;
+    
+        var c = 0;
+        
+        var newGameMoves = removeOOO(game.moves());
+         for (var i = 0; i < newGameMoves.length; i++) {
+            game.move(newGameMoves[i]);
+            
+            if (game.game_over()) {
+            console.log("\t2. "+newGameMoves[i]);
+            c++;
+         	}
+         	
+            game.undo();
+        }
+        return c;
     }
 
     var newGameMoves = removeOOO(game.moves());
-    console.log(newGameMoves);
-
+    
 	 for (var i = 0; i < newGameMoves.length; i++) {
             game.move(newGameMoves[i]);
-            console.log("\t2. "+newGameMoves[i]);
             minimax(depth - 1, game, !isMaximisingPlayer);
             game.undo();
         }
-    return 1;
+    return 0;
     
 };
 
