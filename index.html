@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap.css">
     <link rel="stylesheet" href="lib/chessboardjs/css/chessboard-0.3.0.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,14 +17,14 @@
     <form>     
     
     <div class="form-group">
-    <label># moves:</label>    
+    <label>Number of moves:</label>    
     <select id="search-depth" class="form-control">
-        <option value="1">1</option>
+        <option value="1" >1</option>
         <option value="2" selected>2</option>
-        <option value="3">3</option>
+        <!-- <option value="3">3</option> -->
     </select>
 
-    <label>First move:</label>
+    <label>First move by:</label>
     <select id="move-turn" class="form-control">
         <option value="0" selected>White</option>
         <option value="1" >Black</option>
@@ -53,7 +53,7 @@
 <script src="lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="lib/chessboardjs/js/chess.js"></script>
 <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
-<script src="ml.js"></script>
+<!-- <script src="ml.js"></script> -->
 <script src="script.js"></script>
 
 <script>

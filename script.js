@@ -1,4 +1,4 @@
-var chess, board, depth_think, turn, move_turn, moveCounter, timer;
+var chess, board, depth_think, turn, move_turn, possibleMoves;
 
 game = new Chess();
 
@@ -8,14 +8,180 @@ board = ChessBoard('board', {
   sparePieces: true
 });
 
-// tmp
-let tmp2 = '8/3K1p2/BN3B2/b1k5/1N6/2p1P3/2P5/8';
+
+
+
+
+function findSolution() {
+
+
+	//let tmp2 = '8/3K1p2/BN3B2/b1k5/1N6/2p1P3/2P5/8';
+	let tmp2 = '5K2/5P2/3krp2/R7/3p1pQ1/8/2R1PN2/8';
+
 	board.position(tmp2);
-	moveCounter = 0;
-  if (moveCounter % 2 == 0) turn = 'w'; else turn = 'b';
-   var tmp  = board.position('fen')+' '+turn+' KQkq - 0 1';
-   game.load(tmp);
+
+	console.log(board.position('fen'));	
+
+	depth_think = parseInt($("#search-depth").val());
+	move_turn = parseInt($("#move-turn").val());
 	
+	turn = (move_turn % 2 == 0) ? 'w' : 'b';
+   let tmp  = board.position('fen')+' '+turn+' KQkq - 0 1';
+   game.load(tmp);
+
+   //let res = recursiveSolving(depth_think, 0, []);
+   let res = iterativeSolution();
+
+   console.log(res);
+  
+  
+ 
+
+}
+
+// 2 moves max only solve for now
+function iterativeSolution() {
+	let solution = [];
+
+
+	// 1 move 
+	if (depth_think == 1) {
+		allMoves();
+
+		possibleMoves.forEach(move => {
+			if (move.includes('#')) {
+				solution.push(move);
+			}
+		});
+		return solution;
+	}
+
+	// 2 move
+	if (depth_think == 2) {
+		allMoves();
+		for(let i =0; i<possibleMoves.length; i++) {
+			
+
+			// 1 first move
+			solution.push("1."+possibleMoves[i]);
+			game.move(possibleMoves[i]);
+
+			// 2 check all opponent responses
+			allMoves();
+			let response, opponentsMoves = possibleMoves, possibleSolution = [];
+			for (let j=0; j<opponentsMoves.length; j++) {
+				response = opponentsMoves[j];
+				game.move(response);
+
+
+
+				// 3 check if we have a checkmate (even if only option it enough)
+				allMoves();
+				let lastMoveSolution = []
+				possibleMoves.forEach(move => {
+					if (move.includes('#')) {
+						lastMoveSolution.push(move);
+					}
+				});
+
+				// 4 Not found checkmates in current state => rollback
+				if (lastMoveSolution.length == 0) {
+					// two undo to start from begin with next solution
+					game.undo();
+					game.undo();
+					allMoves();
+					
+					// clear solution array
+					solution.pop();
+
+					break; // break opponent moves loop
+				}
+
+				// 5 Found solution for all possible opponent moves so its a solution of task
+				if (lastMoveSolution.length > 0) {
+					possibleSolution.push('2.'+response+' - '+lastMoveSolution[0]);
+					game.undo();
+
+
+					// if checked all option so we found solution
+					if (j == opponentsMoves.length-1) {
+						solution.push(possibleSolution);
+						return solution;
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+}
+
+/*
+function recursiveSolving(depth, moveIndex, solutions) {
+	if (depth == 0)
+		return solutions;
+
+
+	// get all possible moves
+	allMoves();	
+
+	// checkmate in 1 move
+	if (depth == 1) {
+
+		lastMoveSolution = []
+		possibleMoves.forEach(move => {
+			if (move.includes('#')) {
+				lastMoveSolution.push(move);
+			}
+		});
+
+		
+		if (lastMoveSolution.length > 0) {
+			return solutions.push(lastMoveSolution);
+		}
+		else {
+			console.log('depth = '+depth+' moveIndex = '+moveIndex);
+			moveIndex++;
+			
+
+		// rollback game state
+		for (let i =0; i < (depth_think - 1) * 2; i++) {  game.undo(); }
+		moveIndex++;
+
+		}
+	}
+
+	else {
+
+		let move;
+		if (game.turn() == turn) {
+			move = game.move(possibleMoves[moveIndex]);
+			console.log(move);
+			--depth;
+			
+		}
+
+		else {
+			for (let i =0; i < possibleMoves.length; i++) {
+				game.move(possibleMoves[i]);
+				console.log(move);
+			}
+		}
+		recursiveSolving(depth, moveIndex, solutions);
+	}
+
+}
+*/
+
+
+// controls functions
+
+function allMoves() {
+	possibleMoves = removeOOO(game.moves());
+	//console.log(JSON.parse(JSON.stringify(possibleMoves)));
+ }
 
 function removeOOO(arr) {
 	let j1 = arr.indexOf("O-O");
@@ -27,191 +193,18 @@ function removeOOO(arr) {
 }
 
 
-function findSolution() {
-var solve = [];
-var bestMove = getBestMove(game, solve);
-    game.move(bestMove);
-    board.position(game.fen());
-   
-   
-   console.log(solve);
-   
-    if (game.game_over()) {
-        alert('Game over');
-    }
-
-}
-
-// recurcive
-/*
-function findSolution(depth) {
-
-	if (depth % 2 == 0) turn = 'w'; else turn = 'b';
-   	var tmp_pos  = board.position('fen')+' '+turn+' KQkq - 0 1';
-   	game.load(tmp_pos);
-
-	// base
-	if (depth == 2) {
-	
-		let moves = game.moves();
-		moves = removeOOO(moves);
-		for(let i=0; i<moves.length; i++) {
-			
-			game.move(moves[i]);
-			if (game.game_over() === true) {
-				console.log(moves[i]);
-			}
-			else {
-			game.undo();
-			}
-			
-		}
-	
-		return;
-	}
-	
-	else {
-	
-		
-   	
-		let moves = game.moves();
-		moves = removeOOO(moves);
-		//console.log(moves);		
-		//console.log("\n");
-		for(let i=0; i<moves.length; i++) {
-			let m = moves[i];
-			//console.log(m);
-			game.move(moves[i]);
-			board.position(game.fen());
-			findSolution(++depth);
-			game.undo();
-		}
-	}
-	// recusion
-
-}
-*/
-
-/*  // iterative
-function findSolution() {
-
-	let tmp2 = '8/3K1p2/BN3B2/b1k5/1N6/2p1P3/2P5/8';
-	board.position(tmp2);
-	console.log(board.position('fen'));
-
-	//depth_think = parseInt($("#search-depth").val());
-	//move_turn = parseInt($("#move-turn").val());
-	
-	move_turn = 0;
-	
-  moveCounter = move_turn;
-  if (moveCounter % 2 == 0) turn = 'w'; else turn = 'b';
-   var tmp  = board.position('fen')+' '+turn+' KQkq - 0 1';
-   game.load(tmp);
-  
-  
-  
-  // first white move
-  var possibleMoves = game.moves();
-  removeOOO(possibleMoves);
-  
-  for (let i=0; i<possibleMoves.length; i++) {
-  		
-  		let solution = [];
-  		
-  		game.move(possibleMoves[i]);
-  		solution.push(possibleMoves[i]);
-  		
-  		// Black answer (for all black moves shoud be checkmate)
-  		var possibleMovesAnswer = game.moves();
-  		removeOOO(possibleMovesAnswer);
-  		
-  		
-  		let solArr = new Array(possibleMovesAnswer.length);
-  		let solVec = new Array(possibleMovesAnswer.length);
-  		
-  		
-  		for (let k = 0; k<possibleMovesAnswer.length; k++) {
-  			solVec[k]=0;
-  			game.move(possibleMovesAnswer[k]);
-  			
-  			// White move (which should finish game)
-  			var possibleCheckMates = game.moves();
-  			removeOOO(possibleCheckMates);
-  			
-  			console.log(possibleCheckMates);
-  			
-  			for (let j = 0; j<possibleCheckMates.length; j++) {
-  				let move = possibleCheckMates[j];
-  				game.move(move);
-  				//if (game.game_over() === true) {
-  				if (game.in_checkmate() === true) { 
-  					solVec[k] = 1; 
-  					solArr.push({'B': possibleMovesAnswer[k], 'W': possibleCheckMates[j]});
-  					break;
-  				}
-  				
-  				else {
-  					solVec[k] = 0; 
-  					game.undo();
-  				}
-  				
-  			}
-  			
-  			game.undo();
-  			
-  		}
-  		
-  		
-  		
-  			
-  			// check if all black moves exist white checkmate move
-  			result = true;
-  			for (let p=0; p<solVec.length; p++) {
-  				if (solVec[p] == 0) {
-  					result = false; // if exist one moves which white not find checkmate false
-  					break;
-  				}
-  			}
-  			
-  			// if all moves of black white succesed to make checkmate -> generate solution 
-  			if (result == true) {
-  				solution.push(solArr);
-  				return solution;
-  			}
-  			else  {
-  				game.undo();
-  			}
-  		
-  	}
-  
- 
- return false;
-}
-*/
-
- 
-
-
-
-
-
 function clearTask() {
   board.clear();
   game.clear();
 
-   clearTimeout(timer);
+   
 }
 
-function stop() {
-	clearTimeout(timer);
-}
+function stop() {}
 
 
 function start() {
-//console.log(findSolution());
-findSolution(0);
-	//timer = setInterval(findSolution, 1000);
+	findSolution()
 }
 
 $('#solve').on('click', start);
