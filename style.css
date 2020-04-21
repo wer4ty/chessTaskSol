@@ -17,3 +17,7 @@
     max-height: 100px;
     overflow-y: scroll;
 }
+
+.form-line {
+    display: flex;
+}
