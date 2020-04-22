@@ -1,4 +1,4 @@
-var chess, board, depth_think, turn, move_turn, possibleMoves;
+var chess, board, depth_think, turn, move_turn, possibleMoves, resString;
 
 game = new Chess();
 
@@ -14,13 +14,18 @@ board = ChessBoard('board', {
 
 function findSolution() {
 
+    resString = '';
 
 	//let tmp2 = '8/3K1p2/BN3B2/b1k5/1N6/2p1P3/2P5/8';
-	let tmp2 = '5K2/5P2/3krp2/R7/3p1pQ1/8/2R1PN2/8';
+	//let tmp2 = '5K2/5P2/3krp2/R7/3p1pQ1/8/2R1PN2/8';
 
-	board.position(tmp2);
+	//let tmp3 = 'k7/2K5/8/5Q2/8/8/8/8';
 
-	console.log(board.position('fen'));	
+	//board.position(tmp2);
+
+
+
+	
 
 	depth_think = parseInt($("#search-depth").val());
 	move_turn = parseInt($("#move-turn").val());
@@ -32,7 +37,19 @@ function findSolution() {
    //let res = recursiveSolving(depth_think, 0, []);
    let res = iterativeSolution();
 
-   console.log(res);
+   if (res && res.length > 0) { 
+	   
+    let readible = recursivePrint(res);
+    console.log(readible);
+   	$('#res').html(readible);
+   }
+
+   else {
+	$('#res').text('No solution.');   
+   }
+
+   $('#res').fadeIn();
+
   
   
  
@@ -57,21 +74,33 @@ function iterativeSolution() {
 	}
 
 	// 2 move
+	let firstMoves = [];
 	if (depth_think == 2) {
-		allMoves();
-		for(let i =0; i<possibleMoves.length; i++) {
+		firstMoves = allMoves();
+		for(let i =0; i<firstMoves.length; i++) {
 			
 
 			// 1 first move
-			solution.push("1."+possibleMoves[i]);
-			game.move(possibleMoves[i]);
+			solution.push("1."+firstMoves[i]);
+			game.move(firstMoves[i]);
+			visual();
+
 
 			// 2 check all opponent responses
 			allMoves();
 			let response, opponentsMoves = possibleMoves, possibleSolution = [];
+			
+			if (!opponentsMoves || opponentsMoves.length == 0) {
+				solution.pop();
+				game.undo;
+				visual();
+				continue;
+			}
+
 			for (let j=0; j<opponentsMoves.length; j++) {
 				response = opponentsMoves[j];
 				game.move(response);
+				visual();
 
 
 
@@ -89,6 +118,7 @@ function iterativeSolution() {
 					// two undo to start from begin with next solution
 					game.undo();
 					game.undo();
+					visual();
 					allMoves();
 					
 					// clear solution array
@@ -101,6 +131,7 @@ function iterativeSolution() {
 				if (lastMoveSolution.length > 0) {
 					possibleSolution.push('2.'+response+' - '+lastMoveSolution[0]);
 					game.undo();
+					visual();
 
 
 					// if checked all option so we found solution
@@ -177,10 +208,29 @@ function recursiveSolving(depth, moveIndex, solutions) {
 
 
 // controls functions
+async function visual() {
+	//await setTimeout(() => {}, 2000);
+	//board.position(game.fen().split(' ')[0]);
+}
+
+function recursivePrint(solution) {
+
+    if (Array.isArray(solution)) {
+		solution.forEach(s => {
+            (Array.isArray(s)) ?  resString+='\t' : resString+='' ;
+             recursivePrint(s);
+		});
+    }
+
+      resString+= solution+'<br>'; 
+
+}
 
 function allMoves() {
 	possibleMoves = removeOOO(game.moves());
+	let localArray = possibleMoves;
 	//console.log(JSON.parse(JSON.stringify(possibleMoves)));
+	return localArray;
  }
 
 function removeOOO(arr) {
@@ -196,11 +246,14 @@ function removeOOO(arr) {
 function clearTask() {
   board.clear();
   game.clear();
+  $('#res').fadeOut();
 
    
 }
 
-function stop() {}
+function stop() {
+	$('#res').fadeOut();
+}
 
 
 function start() {

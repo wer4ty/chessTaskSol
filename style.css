@@ -4,20 +4,8 @@
     margin-top: 40px;
 }
 
-.info {
-    position: absolute;
-    left:5%;
-    top:1%;
-    width: 300px;
-    display: block;
-    
-}
-
-.move-history {
-    max-height: 100px;
-    overflow-y: scroll;
-}
-
 .form-line {
     display: flex;
 }
+
+#res { display: none;}
