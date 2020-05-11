@@ -41,13 +41,21 @@ function findSolution() {
    	let prettyViewText = '';
     res.forEach(r => {
 
-        if (Array.isArray(r)) { prettyViewText += '<ul>'+r.join('')+'</ul>'; }
+        if (Array.isArray(r)) {
+            r.forEach(r2 => {
+            	r2 = (Array.isArray(r2)) ? r2.join('') : r2;
+            })
+
+
+            prettyViewText += '<ul>'+r.join('')+'</ul>'; 
+        }
         else prettyViewText += '<b>'+r+'</b><br>';
 
     });
-   	 
+
+    console.log(res);   	 
 	$('#res').html(prettyViewText);   
-    console.log(res);
+
    	
    }
 
@@ -96,6 +104,11 @@ function iterativeSolution() {
 			
 
 			// 1 first move
+
+            // skip checkmate at first move
+            if (firstMoves[i].includes('#')) 
+                continue;
+
 			solution.push("1."+firstMoves[i]);
 			game.move(firstMoves[i]);
 
@@ -158,6 +171,80 @@ function iterativeSolution() {
 		}
 
     return solution;
+	}
+
+	if (depth_think == 3) {
+	
+
+
+            firstMoves = allMoves();
+
+        if (!possibleMoves || possibleMoves.length == 0)
+		    return solution;
+
+
+        let initialState = game.fen();
+		for(let i =0; i<firstMoves.length; i++) {
+			
+
+			// 1 first move
+
+            // skip checkmate at first move
+            if (firstMoves[i].includes('#')) 
+                continue;
+
+			solution.push("1."+firstMoves[i]);
+			game.move(firstMoves[i]);
+
+
+			// 2 check all opponent responses
+			allMoves();
+			let response, opponentsMoves = possibleMoves, possibleSolution = [];
+			
+			if (!opponentsMoves || opponentsMoves.length == 0) {
+				solution.pop();
+				game.undo;
+				continue;
+			}
+
+            // save current state
+            let stateBeforeOppenentReact = game.fen();
+
+			for (let j=0; j<opponentsMoves.length; j++) {
+				response = opponentsMoves[j];
+				solution.push("<li> >> "+response+"</li>");
+				game.move(response);
+
+                
+
+                // reduction to simpler problem 
+                depth_think > 2 ? depth_think-- : depth_think; // 2 steps instead 3
+                possibleSolution = iterativeSolution();
+
+                // there is solution
+                if (possibleSolution.length > 0) {
+                    solution.push(possibleSolution);
+                    game.load(stateBeforeOppenentReact);
+                }
+
+                // there is no solution
+                else {
+                	solution.pop();
+                	solution.pop();
+                	game.load(initialState);
+
+                }
+
+			}
+
+		}
+
+
+
+
+
+
+        return solution;
 	}
 }
 
