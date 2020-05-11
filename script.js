@@ -42,7 +42,7 @@ function findSolution() {
     res.forEach(r => {
 
         if (Array.isArray(r)) { prettyViewText += '<ul>'+r.join('')+'</ul>'; }
-        else prettyViewText += '<b>'+r+':</b><br>';
+        else prettyViewText += '<b>'+r+'</b><br>';
 
     });
    	 
