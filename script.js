@@ -40,7 +40,7 @@ function findSolution() {
    if (res && res.length > 0) { 
 	   
     let readible = recursivePrint(res);
-    console.log(readible);
+    console.log(res);
    	$('#res').html(readible);
    }
 
@@ -83,7 +83,6 @@ function iterativeSolution() {
 			// 1 first move
 			solution.push("1."+firstMoves[i]);
 			game.move(firstMoves[i]);
-			visual();
 
 
 			// 2 check all opponent responses
@@ -93,14 +92,12 @@ function iterativeSolution() {
 			if (!opponentsMoves || opponentsMoves.length == 0) {
 				solution.pop();
 				game.undo;
-				visual();
 				continue;
 			}
 
 			for (let j=0; j<opponentsMoves.length; j++) {
 				response = opponentsMoves[j];
 				game.move(response);
-				visual();
 
 
 
@@ -118,7 +115,6 @@ function iterativeSolution() {
 					// two undo to start from begin with next solution
 					game.undo();
 					game.undo();
-					visual();
 					allMoves();
 					
 					// clear solution array
@@ -131,13 +127,13 @@ function iterativeSolution() {
 				if (lastMoveSolution.length > 0) {
 					possibleSolution.push('2.'+response+' - '+lastMoveSolution[0]);
 					game.undo();
-					visual();
 
 
 					// if checked all option so we found solution
 					if (j == opponentsMoves.length-1) {
 						solution.push(possibleSolution);
-						return solution;
+						possibleSolution = [];
+						game.undo();
 					}
 
 				}
@@ -146,6 +142,7 @@ function iterativeSolution() {
 
 		}
 
+    return solution;
 	}
 }
 
@@ -208,10 +205,7 @@ function recursiveSolving(depth, moveIndex, solutions) {
 
 
 // controls functions
-async function visual() {
-	//await setTimeout(() => {}, 2000);
-	//board.position(game.fen().split(' ')[0]);
-}
+
 
 function recursivePrint(solution) {
 
