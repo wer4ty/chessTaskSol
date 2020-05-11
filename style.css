@@ -9,3 +9,18 @@
 }
 
 #res { display: none;}
+
+#res b {margin-top: 10px;display: block;margin-bottom: -10px;}
+#res b:first-child { margin-block-start: 0px;}
+
+#res span {
+    margin-inline-start: 10px;
+}
+
+#res ul {
+    list-style-type: circle;
+}
+
+#res li {
+    display: block;
+}

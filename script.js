@@ -14,8 +14,7 @@ board = ChessBoard('board', {
 
 function findSolution() {
 
-    resString = '';
-
+   
 	//let tmp2 = '8/3K1p2/BN3B2/b1k5/1N6/2p1P3/2P5/8';
 	//let tmp2 = '5K2/5P2/3krp2/R7/3p1pQ1/8/2R1PN2/8';
 
@@ -34,14 +33,22 @@ function findSolution() {
    let tmp  = board.position('fen')+' '+turn+' KQkq - 0 1';
    game.load(tmp);
 
-   //let res = recursiveSolving(depth_think, 0, []);
+   
    let res = iterativeSolution();
 
-   if (res && res.length > 0) { 
-	   
-    let readible = recursivePrint(res);
+   if (res && res.length > 0) {
+
+   	let prettyViewText = '';
+    res.forEach(r => {
+
+        if (Array.isArray(r)) { prettyViewText += '<ul>'+r.join('')+'</ul>'; }
+        else prettyViewText += '<b>'+r+':</b><br>';
+
+    });
+   	 
+	$('#res').html(prettyViewText);   
     console.log(res);
-   	$('#res').html(readible);
+   	
    }
 
    else {
@@ -133,7 +140,7 @@ function iterativeSolution() {
 
 				// 5 Found solution for all possible opponent moves so its a solution of task
 				if (lastMoveSolution.length > 0) {
-					possibleSolution.push('2.'+response+' - '+lastMoveSolution[0]);
+					possibleSolution.push('<li>2.'+response+' - '+lastMoveSolution[0]+'</li>');
 					game.undo();
 
 
@@ -154,79 +161,7 @@ function iterativeSolution() {
 	}
 }
 
-/*
-function recursiveSolving(depth, moveIndex, solutions) {
-	if (depth == 0)
-		return solutions;
 
-
-	// get all possible moves
-	allMoves();	
-
-	// checkmate in 1 move
-	if (depth == 1) {
-
-		lastMoveSolution = []
-		possibleMoves.forEach(move => {
-			if (move.includes('#')) {
-				lastMoveSolution.push(move);
-			}
-		});
-
-		
-		if (lastMoveSolution.length > 0) {
-			return solutions.push(lastMoveSolution);
-		}
-		else {
-			console.log('depth = '+depth+' moveIndex = '+moveIndex);
-			moveIndex++;
-			
-
-		// rollback game state
-		for (let i =0; i < (depth_think - 1) * 2; i++) {  game.undo(); }
-		moveIndex++;
-
-		}
-	}
-
-	else {
-
-		let move;
-		if (game.turn() == turn) {
-			move = game.move(possibleMoves[moveIndex]);
-			console.log(move);
-			--depth;
-			
-		}
-
-		else {
-			for (let i =0; i < possibleMoves.length; i++) {
-				game.move(possibleMoves[i]);
-				console.log(move);
-			}
-		}
-		recursiveSolving(depth, moveIndex, solutions);
-	}
-
-}
-*/
-
-
-// controls functions
-
-
-function recursivePrint(solution) {
-
-    if (Array.isArray(solution)) {
-		solution.forEach(s => {
-            (Array.isArray(s)) ?  resString+='\t' : resString+='' ;
-             recursivePrint(s);
-		});
-    }
-
-      resString+= solution+'<br>'; 
-
-}
 
 function allMoves() {
 
