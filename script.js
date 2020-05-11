@@ -65,6 +65,9 @@ function iterativeSolution() {
 	if (depth_think == 1) {
 		allMoves();
 
+		if (!possibleMoves || possibleMoves.length == 0)
+		    return solution;
+
 		possibleMoves.forEach(move => {
 			if (move.includes('#')) {
 				solution.push(move);
@@ -77,6 +80,11 @@ function iterativeSolution() {
 	let firstMoves = [];
 	if (depth_think == 2) {
 		firstMoves = allMoves();
+
+        if (!possibleMoves || possibleMoves.length == 0)
+		    return solution;
+
+
 		for(let i =0; i<firstMoves.length; i++) {
 			
 
@@ -221,6 +229,11 @@ function recursivePrint(solution) {
 }
 
 function allMoves() {
+
+    // empty board
+    if (game.fen().split(' ')[0] == '8/8/8/8/8/8/8/8')
+        return
+
 	possibleMoves = removeOOO(game.moves());
 	let localArray = possibleMoves;
 	//console.log(JSON.parse(JSON.stringify(possibleMoves)));
@@ -228,6 +241,10 @@ function allMoves() {
  }
 
 function removeOOO(arr) {
+
+    if (!arr || arr.length == 0)
+    return arr;
+
 	let j1 = arr.indexOf("O-O");
   if(j1 != -1 ) { arr.splice(j1, 1); }
   let j2 = arr.indexOf("O-O-O");
